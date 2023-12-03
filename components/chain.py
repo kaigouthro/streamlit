@@ -110,7 +110,7 @@ def modify_chain(chain_name, agents):
                     )
 
         if len(chain["steps"]) > 0:
-            step_number = max([s["step"] for s in chain["steps"]]) + 1 if chain else 1
+            step_number = max(s["step"] for s in chain["steps"]) + 1 if chain else 1
         else:
             step_number = 1
 

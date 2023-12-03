@@ -15,8 +15,9 @@ st.session_state = {}
 chain_names = ApiClient.get_chains()
 agents = ApiClient.get_agents()
 st.header("Chain Management")
-show_injection_var_docs = st.checkbox("Show Prompt Injection Variable Documentation")
-if show_injection_var_docs:
+if show_injection_var_docs := st.checkbox(
+    "Show Prompt Injection Variable Documentation"
+):
     predefined_injection_variables()
 chain_action = st.selectbox("Action", ["Create Chain", "Modify Chain", "Delete Chain"])
 
@@ -27,9 +28,7 @@ else:
 
 if chain_action == "Create Chain":
     action_button = st.button("Create New Chain")
-    # Import Chain
-    chain_file = st.file_uploader("Import Chain", type=["json"])
-    if chain_file:
+    if chain_file := st.file_uploader("Import Chain", type=["json"]):
         chain_name = chain_file.name.split(".")[0]
         chain_content = chain_file.read().decode("utf-8")
         steps = json.loads(chain_content)
@@ -45,8 +44,7 @@ if chain_action == "Create Chain":
             st.error("Chain name is required.")
 
 elif chain_action == "Delete Chain":
-    action_button = st.button("Delete Chain")
-    if action_button:
+    if action_button := st.button("Delete Chain"):
         if chain_name:
             ApiClient.delete_chain(chain_name=chain_name)
             st.success(f"Chain '{chain_name}' deleted.")
