@@ -17,7 +17,7 @@ st.set_page_config(
 
 agixt_docs()
 
-if agent_name == "":
+if not agent_name:
     st.markdown("# Getting Started")
     st.markdown(
         "If you do not intend to use the OpenAI agent at this time, go to the [Agent Management](Agent_Management) page and create a new agent for your chosen provider, or modify the default OpenAI agent there."

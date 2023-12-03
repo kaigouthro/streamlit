@@ -72,11 +72,9 @@ def get_history(agent_name, conversation_name):
                 for item in history:
                     item["message"] = html.escape(item["message"])
                     item["message"] = item["message"].replace(r"\n", "<br>")
-                    code_block_match = re.search(
+                    if code_block_match := re.search(
                         r"```(.*)```", item["message"], re.DOTALL
-                    )
-
-                    if code_block_match:
+                    ):
                         code_message = code_block_match.group(1)
                         item["message"] = re.sub(
                             r"```.*```",
@@ -114,7 +112,7 @@ def build_args(args: dict = {}, prompt: dict = {}, step_number: int = 0):
 
 
 def prompt_options(prompt: dict = {}, step_number: int = 0):
-    if prompt == {}:
+    if not prompt:
         ops = False
     else:
         for opt in [
@@ -132,10 +130,11 @@ def prompt_options(prompt: dict = {}, step_number: int = 0):
                 break
             else:
                 ops = True
-    advanced_options = st.checkbox(
-        "Show Advanced Options", value=ops, key=f"advanced_options_{step_number}"
-    )
-    if advanced_options:
+    if advanced_options := st.checkbox(
+        "Show Advanced Options",
+        value=ops,
+        key=f"advanced_options_{step_number}",
+    ):
         conversation_results = st.number_input(
             "How many conversation results to inject (Default is 5)",
             min_value=1,
@@ -197,7 +196,7 @@ def prompt_options(prompt: dict = {}, step_number: int = 0):
         else:
             enable_memory = st.checkbox(
                 "Enable Memory Training (Any messages sent to and from the agent will be added to memory if enabled.)",
-                value=True if prompt["disable_memory"] == False else False,
+                value=prompt["disable_memory"] == False,
                 key=f"enable_memory_{step_number}",
             )
     else:
@@ -215,7 +214,7 @@ def prompt_options(prompt: dict = {}, step_number: int = 0):
         "browse_links": browse_links,
         "websearch": websearch,
         "websearch_depth": websearch_depth,
-        "disable_memory": (True if enable_memory == False else False),
+        "disable_memory": enable_memory == False,
         "inject_memories_from_collection_number": inject_memories_from_collection_number,
         "conversation_results": conversation_results,
     }
@@ -259,22 +258,21 @@ def prompt_selection(prompt: dict = {}, step_number: int = 0):
             prompt_name=prompt_name, prompt_category=prompt_category
         )
         args = build_args(args=prompt_args, prompt=prompt, step_number=step_number)
-        new_prompt = {
+        return {
             "prompt_name": prompt_name,
             "prompt_category": prompt_category,
             **args,
             **prompt_args_values,
         }
-        return new_prompt
 
 
 def command_selection(prompt: dict = {}, step_number: int = 0):
     agent_commands = cached_get_extensions()
     available_commands = []
     for commands in agent_commands:
-        for command in commands["commands"]:
-            available_commands.append(command["friendly_name"])
-
+        available_commands.extend(
+            command["friendly_name"] for command in commands["commands"]
+        )
     command_name = st.selectbox(
         "Select Command",
         [""] + available_commands,
@@ -287,11 +285,10 @@ def command_selection(prompt: dict = {}, step_number: int = 0):
     if command_name:
         command_args = ApiClient.get_command_args(command_name=command_name)
         args = build_args(args=command_args, prompt=prompt, step_number=step_number)
-        new_prompt = {
+        return {
             "command_name": command_name,
             **args,
         }
-        return new_prompt
 
 
 def chain_selection(prompt: dict = {}, step_number: int = 0):
@@ -312,8 +309,7 @@ def chain_selection(prompt: dict = {}, step_number: int = 0):
         chain_args = ApiClient.get_chain_args(chain_name=chain_name)
         for arg in chain_args:
             if arg not in skip_args and arg != "user_input":
-                override_arg = st.checkbox(f"Override `{arg}` argument.")
-                if override_arg:
+                if override_arg := st.checkbox(f"Override `{arg}` argument."):
                     args[arg] = st.text_area(arg)
         args["chain"] = chain_name
         args["input"] = user_input
@@ -371,14 +367,12 @@ def helper_agent_selection(
     agent_config = ApiClient.get_agentconfig(agent_name=current_agent)
     agent_settings = agent_config.get("settings", {})
     helper_agent = agent_settings.get("helper_agent_name", current_agent)
-    # Create the selectbox
-    selected_agent = st.selectbox(
+    return st.selectbox(
         heading,
         options=[""] + agent_names,
         index=agent_names.index(helper_agent) + 1,
         key=key,
     )
-    return selected_agent
 
 
 def conversation_selection(agent_name):

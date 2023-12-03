@@ -14,14 +14,12 @@ st.set_page_config(
 agixt_docs()
 
 st.header("Agent Training")
-agent_name = agent_selection()
-if agent_name:
+if agent_name := agent_selection():
     mode = st.selectbox(
         "Select Training Source",
         ["Website", "File", "Text", "GitHub Repository"],
     )
-    advanced_options = st.checkbox("Show advanced options")
-    if advanced_options:
+    if advanced_options := st.checkbox("Show advanced options"):
         predefined_memory_collections()
         collection_number = st.number_input(
             "Add memories to collection number (Default is 0)",
@@ -91,10 +89,7 @@ if agent_name:
                         collection_number=collection_number,
                     )
                 st.success(
-                    "Agent '"
-                    + agent_name
-                    + "' has learned from file: "
-                    + learn_file_upload.name
+                    f"Agent '{agent_name}' has learned from file: {learn_file_upload.name}"
                 )
     elif mode == "Text":
         st.markdown("### Train from Text")
@@ -124,14 +119,11 @@ if agent_name:
         github_repo = st.text_input(
             "Enter a GitHub repository for the agent to learn from.. For example, 'Josh-XT/AGiXT'"
         )
-        branch = st.checkbox("Use a branch other than `main`")
-        if branch:
+        if branch := st.checkbox("Use a branch other than `main`"):
             github_branch = st.text_input("Enter a GitHub branch. (Default is main)")
         else:
             github_branch = "main"
-        # Private repository checkbox
-        private_repo = st.checkbox("Private repository")
-        if private_repo:
+        if private_repo := st.checkbox("Private repository"):
             use_agent_settings = st.checkbox(
                 "Use agent settings for GitHub credentials", value=True
             )

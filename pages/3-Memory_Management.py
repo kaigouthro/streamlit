@@ -21,8 +21,7 @@ st.header("Memory Management")
 st.markdown(
     "The `Search Query` is essentially what you would type to the AI when you're talking to it, this will show you what results would be injected in context for anything you say to the AI based on its memory collection. This will find similar results to anything you type with relevance score from memory. You can choose to delete memories from the memory collection here."
 )
-agent_name = agent_selection()
-if agent_name:
+if agent_name := agent_selection():
     if "advanced_options" not in st.session_state:
         st.session_state["advanced_options"] = False
 
@@ -92,7 +91,7 @@ if agent_name:
                     st.markdown(
                         f"**Memory Source:** `{memory['external_source_name']}`"
                     )
-                st.markdown(f"**Memory:**")
+                st.markdown("**Memory:**")
                 st.markdown(f"```{memory['additional_metadata']}```")
                 if st.form_submit_button("Delete Memory"):
                     res = ApiClient.delete_agent_memory(

@@ -11,8 +11,7 @@ st.set_page_config(
 agixt_docs()
 
 st.header("Prompt Management")
-show_documentation = st.checkbox("Show Documentation")
-if show_documentation:
+if show_documentation := st.checkbox("Show Documentation"):
     st.markdown("### Usage Instructions")
     st.markdown(
         """
@@ -29,8 +28,7 @@ if show_documentation:
 
 prompt_categories = ApiClient.get_prompt_categories()
 action = st.selectbox("Action", ["Create New Prompt", "Modify Prompt", "Delete Prompt"])
-new_prompt_category = st.checkbox("New Prompt Category", value=False)
-if new_prompt_category:
+if new_prompt_category := st.checkbox("New Prompt Category", value=False):
     prompt_category = st.text_input("New Prompt Category Name")
     if st.button("Create Prompt Category"):
         prompt_list = ApiClient.get_prompts(prompt_category=prompt_category)
@@ -47,12 +45,10 @@ else:
         if st.button("Delete Prompt Category"):
             # TODO: Create this endpoint on the back end and in the SDK
             # ApiClient.delete_prompt_category(prompt_category)
-            st.success(f"Prompt category deletion functionality not yet implemented.")
+            st.success("Prompt category deletion functionality not yet implemented.")
     prompt_list = ApiClient.get_prompts(prompt_category=prompt_category)
     if action == "Create New Prompt":
-        # Import prompt button
-        prompt_file = st.file_uploader("Import Prompt", type=["txt"])
-        if prompt_file:
+        if prompt_file := st.file_uploader("Import Prompt", type=["txt"]):
             prompt_name = prompt_file.name.split(".")[0]
             prompt_content = prompt_file.read().decode("utf-8")
             ApiClient.add_prompt(
